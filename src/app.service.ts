@@ -630,174 +630,174 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_NOON)
-  async sendReminder() {
-    const chunkSize = 10;
-    const dialogChunks = [];
-    const mobitelChunks = [];
-    const delayBetweenRequests = 1000;
+  // @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  // async sendReminder() {
+  //   const chunkSize = 10;
+  //   const dialogChunks = [];
+  //   const mobitelChunks = [];
+  //   const delayBetweenRequests = 1000;
 
-    try {
-      const response = await axios(GET_USER_DATA, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
-      const users = response.data.data;
+  //   try {
+  //     const response = await axios(GET_USER_DATA, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Accept: 'application/json',
+  //       },
+  //     });
+  //     const users = response.data.data;
 
-      const msgData = await axios(GET_REMINDER_MSG, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      });
+  //     const msgData = await axios(GET_REMINDER_MSG, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Accept: 'application/json',
+  //       },
+  //     });
 
-      const reminderMessage = msgData?.data.data[0]?.attributes?.sms
-        ? msgData?.data.data[0]?.attributes?.sms
-        : SMS_REMINDERS[Math.floor(Math.random() * SMS_REMINDERS.length)];
+  //     const reminderMessage = msgData?.data.data[0]?.attributes?.sms
+  //       ? msgData?.data.data[0]?.attributes?.sms
+  //       : SMS_REMINDERS[Math.floor(Math.random() * SMS_REMINDERS.length)];
 
-      if (users) {
-        const mobileNumbers = users.map((user: any) => {
-          return user.attributes.mobile;
-        });
+  //     if (users) {
+  //       const mobileNumbers = users.map((user: any) => {
+  //         return user.attributes.mobile;
+  //       });
 
-        const uniqueMobileNumbers = await _checkDuplicateNumber(mobileNumbers);
+  //       const uniqueMobileNumbers = await _checkDuplicateNumber(mobileNumbers);
 
-        const nullCheckNumbers = uniqueMobileNumbers.filter((element) => {
-          return element !== null;
-        });
+  //       const nullCheckNumbers = uniqueMobileNumbers.filter((element) => {
+  //         return element !== null;
+  //       });
 
-        const dialogNumbers = await Promise.all(
-          nullCheckNumbers.map(async (msisdn: string) => {
-            if (
-              (await validateServiceProvider(msisdn)) ===
-              SERVICE_PROVIDERS.DIALOG
-            ) {
-              return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
-            }
-          }),
-        );
+  //       const dialogNumbers = await Promise.all(
+  //         nullCheckNumbers.map(async (msisdn: string) => {
+  //           if (
+  //             (await validateServiceProvider(msisdn)) ===
+  //             SERVICE_PROVIDERS.DIALOG
+  //           ) {
+  //             return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
+  //           }
+  //         }),
+  //       );
 
-        const mobitelNumbers = await Promise.all(
-          nullCheckNumbers.map(async (msisdn: string) => {
-            if (
-              (await validateServiceProvider(msisdn)) ===
-              SERVICE_PROVIDERS.MOBITEL
-            ) {
-              return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
-            }
-          }),
-        );
+  //       const mobitelNumbers = await Promise.all(
+  //         nullCheckNumbers.map(async (msisdn: string) => {
+  //           if (
+  //             (await validateServiceProvider(msisdn)) ===
+  //             SERVICE_PROVIDERS.MOBITEL
+  //           ) {
+  //             return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
+  //           }
+  //         }),
+  //       );
 
-        // const formatedNumbers = nullCheckNumbers.map((msisdn: string) => {
-        //   return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
-        // });
+  //       // const formatedNumbers = nullCheckNumbers.map((msisdn: string) => {
+  //       //   return `tel:+${mobileGeneratorWithOutPlus(msisdn)}`;
+  //       // });
 
-        const filterUndefined = (arr) =>
-          arr.filter((item) => item !== undefined);
+  //       const filterUndefined = (arr) =>
+  //         arr.filter((item) => item !== undefined);
 
-        // Filter out undefined values from dialogNumbers and mobitelNumbers
-        const filteredDialogNumbers = filterUndefined(dialogNumbers);
-        const filteredMobitelNumbers = filterUndefined(mobitelNumbers);
+  //       // Filter out undefined values from dialogNumbers and mobitelNumbers
+  //       const filteredDialogNumbers = filterUndefined(dialogNumbers);
+  //       const filteredMobitelNumbers = filterUndefined(mobitelNumbers);
 
-        for (let i = 0; i < filteredDialogNumbers.length; i += chunkSize) {
-          dialogChunks.push(filteredDialogNumbers.slice(i, i + chunkSize));
-        }
+  //       for (let i = 0; i < filteredDialogNumbers.length; i += chunkSize) {
+  //         dialogChunks.push(filteredDialogNumbers.slice(i, i + chunkSize));
+  //       }
 
-        for (let i = 0; i < filteredMobitelNumbers.length; i += chunkSize) {
-          mobitelChunks.push(filteredMobitelNumbers.slice(i, i + chunkSize));
-        }
+  //       for (let i = 0; i < filteredMobitelNumbers.length; i += chunkSize) {
+  //         mobitelChunks.push(filteredMobitelNumbers.slice(i, i + chunkSize));
+  //       }
 
-        const sendSMSWithDelay = async (chunk) => {
-          const requestBody = {
-            outboundSMSMessageRequest: {
-              address: chunk,
-              senderAddress: '87798',
-              outboundSMSTextMessage: {
-                message: reminderMessage,
-              },
-              clientCorrelator: '123456',
-              receiptRequest: {
-                notifyURL: null,
-                callbackData: null,
-              },
-              senderName: 'MyCricQ',
-            },
-          };
+  //       const sendSMSWithDelay = async (chunk) => {
+  //         const requestBody = {
+  //           outboundSMSMessageRequest: {
+  //             address: chunk,
+  //             senderAddress: '87798',
+  //             outboundSMSTextMessage: {
+  //               message: reminderMessage,
+  //             },
+  //             clientCorrelator: '123456',
+  //             receiptRequest: {
+  //               notifyURL: null,
+  //               callbackData: null,
+  //             },
+  //             senderName: 'MyCricQ',
+  //           },
+  //         };
 
-          console.log(requestBody);
+  //         console.log(requestBody);
 
-          const response = await axios.post(IDEABIZ_SMS_URL, requestBody, {
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-              Authorization: AUTH_TOKEN,
-            },
-          });
+  //         const response = await axios.post(IDEABIZ_SMS_URL, requestBody, {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             Accept: 'application/json',
+  //             Authorization: AUTH_TOKEN,
+  //           },
+  //         });
 
-          // Process the response if needed
-          this.logger.log(
-            `SMS Dialog sent successfully: ${response.data} |`,
-            AppService.name,
-          );
-        };
+  //         // Process the response if needed
+  //         this.logger.log(
+  //           `SMS Dialog sent successfully: ${response.data} |`,
+  //           AppService.name,
+  //         );
+  //       };
 
-        const sendSMSWithDelayMobitel = async (chunk) => {
-          const requestBody = {
-            version: '1.0',
-            applicationId: MSPACE_APPID,
-            password: 'eea1ebf64d8eca14380a0da39aba9f8b',
-            message: reminderMessage,
-            destinationAddresses: chunk,
-            sourceAddress: '77000',
-            deliveryStatusRequest: '1',
-            encoding: '245',
-            binaryHeader:
-              '526574697265206170706c69636174696f6e20616e642072656c6561736520524b7320696620666f756e642065787069726564',
-          };
+  //       const sendSMSWithDelayMobitel = async (chunk) => {
+  //         const requestBody = {
+  //           version: '1.0',
+  //           applicationId: MSPACE_APPID,
+  //           password: 'eea1ebf64d8eca14380a0da39aba9f8b',
+  //           message: reminderMessage,
+  //           destinationAddresses: chunk,
+  //           sourceAddress: '77000',
+  //           deliveryStatusRequest: '1',
+  //           encoding: '245',
+  //           binaryHeader:
+  //             '526574697265206170706c69636174696f6e20616e642072656c6561736520524b7320696620666f756e642065787069726564',
+  //         };
 
-          const response = await axios(MSPACE_SMS_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-            data: requestBody,
-          });
+  //         const response = await axios(MSPACE_SMS_URL, {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             Accept: 'application/json',
+  //           },
+  //           data: requestBody,
+  //         });
 
-          // Process the response if needed
-          this.logger.log(
-            `SMS Mobitel sent successfully: ${response.data} |`,
-            AppService.name,
-          );
-        };
+  //         // Process the response if needed
+  //         this.logger.log(
+  //           `SMS Mobitel sent successfully: ${response.data} |`,
+  //           AppService.name,
+  //         );
+  //       };
 
-        const sendSMSRequests = async () => {
-          for (const chunk of dialogChunks) {
-            await sendSMSWithDelay(chunk);
-            await new Promise((resolve) =>
-              setTimeout(resolve, delayBetweenRequests),
-            );
-          }
+  //       const sendSMSRequests = async () => {
+  //         for (const chunk of dialogChunks) {
+  //           await sendSMSWithDelay(chunk);
+  //           await new Promise((resolve) =>
+  //             setTimeout(resolve, delayBetweenRequests),
+  //           );
+  //         }
 
-          for (const chunk of mobitelChunks) {
-            await sendSMSWithDelayMobitel(chunk);
-            await new Promise((resolve) =>
-              setTimeout(resolve, delayBetweenRequests),
-            );
-          }
-        };
+  //         for (const chunk of mobitelChunks) {
+  //           await sendSMSWithDelayMobitel(chunk);
+  //           await new Promise((resolve) =>
+  //             setTimeout(resolve, delayBetweenRequests),
+  //           );
+  //         }
+  //       };
 
-        // Call the function to start sending SMS requests
-        sendSMSRequests();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  //       // Call the function to start sending SMS requests
+  //       sendSMSRequests();
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   async sendOTP(OTPRequestDTO: OTPRequestDTO): Promise<any> {
     try {
