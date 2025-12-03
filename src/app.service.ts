@@ -4,6 +4,7 @@ import axios from 'axios';
 import {
   AUTH_TOKEN,
   CHARGE_AMOUNT,
+  DELETE_FRIMI_USER,
   DELETE_USER_DATA,
   DELETE_USER_DATA_FROM_ALL,
   GET_REMINDER_MSG,
@@ -963,15 +964,11 @@ export class AppService {
           dto.otp,
         );
 
-        
-
         await this.createPaymentUser(
           dto.mobile,
           response.data?.data?.subscription_id,
           SERVICE_PROVIDERS.HUTCH,
         );
-
-
 
         this.logger.log(
           '==== VERIFY HUTCH ====' + JSON.stringify(response.data),
@@ -1218,6 +1215,11 @@ export class AppService {
   async unsubscribeFullUser(dto: MobileDTO): Promise<any> {
     try {
       console.log(dto);
+      if (dto.tag?.toLowerCase() == 'frimi') {
+        await axios(DELETE_FRIMI_USER + dto.mobile, {
+          method: 'POST',
+        });
+      }
       if (
         (await validateServiceProvider(dto.mobile)) == SERVICE_PROVIDERS.DIALOG
       ) {
