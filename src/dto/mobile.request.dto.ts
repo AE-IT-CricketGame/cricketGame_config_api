@@ -9,5 +9,9 @@ export class MobileDTO {
     @IsOptional()
     serverRef: string;
 
+    @IsOptional()
+    @IsString()
+    tag: string;
+
 }
 
