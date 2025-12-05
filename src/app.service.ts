@@ -630,7 +630,7 @@ export class AppService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  // @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async sendReminder() {
     const chunkSize = 10;
     const dialogChunks = [];
