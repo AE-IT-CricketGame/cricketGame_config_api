@@ -11,7 +11,7 @@ export class MobileDTO {
 
     @IsOptional()
     @IsString()
-    tag: string;
+    tag?: string;
 
 }
 

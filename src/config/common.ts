@@ -8,6 +8,13 @@ export const mobileGeneratorWithOutPlus = (mobile: string) => {
   return `94${mobile.substring(1)}`;
 };
 
+// Strapi v4 wraps fields in `attributes`; Strapi v5 returns them flat.
+// Relations in v4 are additionally wrapped in `data`.
+export const strapiAttrs = (entry: any) => {
+  const value = entry?.data !== undefined ? entry.data : entry;
+  return value?.attributes ?? value;
+};
+
 export const _checkDuplicateNumber = async (csvDataArr) => {
   return [...new Set(csvDataArr)];
 };
