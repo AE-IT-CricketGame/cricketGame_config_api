@@ -501,7 +501,8 @@ export class AppService {
     processUsersWithDelay();
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_NOON)
+  // Superseded by the cycle-based crons; running both at noon double-charged users.
+  // @Cron(CronExpression.EVERY_DAY_AT_NOON)
   async triggerPayments() {
     try {
       this.logger.log(
