@@ -20,6 +20,7 @@ export const SEND_SMS_URL =
   '&from=' +
   SMS_CREDENTIALS.FROM;
 export const DELETE_USER_DATA = MAIN_API + 'leaderboards/';
+export const GET_LEADERBOARD_BY_ID = MAIN_API + 'leaderboards?filters[id][$eq]=';
 export const DELETE_USER_DATA_FROM_ALL = MAIN_API + 'question/delete/';
 export const DELETE_FRIMI_USER = MAIN_API + 'frimi-player/unsubscribe/';
 export const GET_USER_DATA = MAIN_API + 'leaderboards?populate=campaign';

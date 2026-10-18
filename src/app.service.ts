@@ -7,6 +7,7 @@ import {
   DELETE_FRIMI_USER,
   DELETE_USER_DATA,
   DELETE_USER_DATA_FROM_ALL,
+  GET_LEADERBOARD_BY_ID,
   GET_REMINDER_MSG,
   GET_USER_DATA,
   HUTCH_BUNDLE_ID,
@@ -38,6 +39,7 @@ import {
   generateStringHash,
   mobileGenerator,
   mobileGeneratorWithOutPlus,
+  strapiAttrs,
   validateServiceProvider,
 } from './config/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
@@ -74,12 +76,13 @@ export class AppService {
       new Promise((resolve) => setTimeout(resolve, ms));
     const users = response.data.data;
     const processUser = async (element) => {
-      if (element?.attributes?.mobile) {
+      const user = strapiAttrs(element);
+      if (user?.mobile) {
         if (
-          (await validateServiceProvider(element.attributes.mobile)) ==
+          (await validateServiceProvider(user.mobile)) ==
           SERVICE_PROVIDERS.DIALOG
         ) {
-          await axios(getPaymentURL(element?.attributes?.mobile), {
+          await axios(getPaymentURL(user?.mobile), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -89,14 +92,14 @@ export class AppService {
             data: {
               amountTransaction: {
                 clientCorrelator: `${mobileGenerator(
-                  element.attributes.mobile,
+                  user.mobile,
                 )}-${Date.now()}`,
-                endUserId: `tel:${mobileGenerator(element.attributes.mobile)}`,
+                endUserId: `tel:${mobileGenerator(user.mobile)}`,
                 paymentAmount: {
                   chargingInformation: {
                     amount: CHARGE_AMOUNT,
                     currency: 'LKR',
-                    description: `My CrickQ (cycle ${element?.attributes?.cycle}).`,
+                    description: `My CrickQ (cycle ${user?.cycle}).`,
                   },
                   chargingMetaData: {
                     onBehalfOf: 'My CrickQ',
@@ -113,25 +116,25 @@ export class AppService {
           })
             .then(async (res) => {
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 10,
                 JSON.stringify(res?.data ? res.data : res) || 'Internal Error',
               );
               this.logger.log(
-                `USER (1st Cycle): ${element?.attributes?.mobile} |` +
+                `USER (1st Cycle): ${user?.mobile} |` +
                   JSON.stringify(res?.data),
                 AppService.name,
               );
             })
             .catch(async (e) => {
               this.logger.error(
-                `USER (1st Cycle): ${element.attributes.mobile} |` +
+                `USER (1st Cycle): ${user.mobile} |` +
                   JSON.stringify(e?.response?.data),
                 AppService.name,
               );
 
               await this.updatePaymentUser(
-                element?.attributes?.mobile,
+                user?.mobile,
                 2,
                 JSON.stringify(e?.response?.data) || 'Internal Error',
               );
@@ -171,12 +174,13 @@ export class AppService {
       new Promise((resolve) => setTimeout(resolve, ms));
     const users = response.data.data;
     const processUser = async (element) => {
-      if (element.attributes.mobile) {
+      const user = strapiAttrs(element);
+      if (user.mobile) {
         if (
-          (await validateServiceProvider(element.attributes.mobile)) ==
+          (await validateServiceProvider(user.mobile)) ==
           SERVICE_PROVIDERS.DIALOG
         ) {
-          await axios(getPaymentURL(element?.attributes?.mobile), {
+          await axios(getPaymentURL(user?.mobile), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -186,14 +190,14 @@ export class AppService {
             data: {
               amountTransaction: {
                 clientCorrelator: `${mobileGenerator(
-                  element.attributes.mobile,
+                  user.mobile,
                 )}-${Date.now()}`,
-                endUserId: `tel:${mobileGenerator(element.attributes.mobile)}`,
+                endUserId: `tel:${mobileGenerator(user.mobile)}`,
                 paymentAmount: {
                   chargingInformation: {
                     amount: CHARGE_AMOUNT,
                     currency: 'LKR',
-                    description: `My CrickQ (cycle ${element?.attributes?.cycle}).`,
+                    description: `My CrickQ (cycle ${user?.cycle}).`,
                   },
                   chargingMetaData: {
                     onBehalfOf: 'My CrickQ',
@@ -210,25 +214,25 @@ export class AppService {
           })
             .then(async (res) => {
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 10,
                 JSON.stringify(res?.data ? res.data : res) || 'Internal Error',
               );
               this.logger.log(
-                `USER (2nd Cycle): ${element.attributes.mobile} |` +
+                `USER (2nd Cycle): ${user.mobile} |` +
                   JSON.stringify(res?.data),
                 AppService.name,
               );
             })
             .catch(async (e) => {
               this.logger.error(
-                `USER (2nd Cycle): ${element.attributes.mobile} |` +
+                `USER (2nd Cycle): ${user.mobile} |` +
                   JSON.stringify(e?.response?.data),
                 AppService.name,
               );
 
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 3,
                 JSON.stringify(e?.response?.data) || 'Internal Error',
               );
@@ -267,12 +271,13 @@ export class AppService {
       new Promise((resolve) => setTimeout(resolve, ms));
     const users = response.data.data;
     const processUser = async (element) => {
-      if (element.attributes.mobile) {
+      const user = strapiAttrs(element);
+      if (user.mobile) {
         if (
-          (await validateServiceProvider(element.attributes.mobile)) ==
+          (await validateServiceProvider(user.mobile)) ==
           SERVICE_PROVIDERS.DIALOG
         ) {
-          await axios(getPaymentURL(element?.attributes?.mobile), {
+          await axios(getPaymentURL(user?.mobile), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -282,14 +287,14 @@ export class AppService {
             data: {
               amountTransaction: {
                 clientCorrelator: `${mobileGenerator(
-                  element.attributes.mobile,
+                  user.mobile,
                 )}-${Date.now()}`,
-                endUserId: `tel:${mobileGenerator(element.attributes.mobile)}`,
+                endUserId: `tel:${mobileGenerator(user.mobile)}`,
                 paymentAmount: {
                   chargingInformation: {
                     amount: CHARGE_AMOUNT,
                     currency: 'LKR',
-                    description: `My CrickQ (cycle ${element?.attributes?.cycle}).`,
+                    description: `My CrickQ (cycle ${user?.cycle}).`,
                   },
                   chargingMetaData: {
                     onBehalfOf: 'My CrickQ',
@@ -306,25 +311,25 @@ export class AppService {
           })
             .then(async (res) => {
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 10,
                 JSON.stringify(res?.data ? res.data : res) || 'Internal Error',
               );
               this.logger.log(
-                `USER: ${element.attributes.mobile} |` +
+                `USER: ${user.mobile} |` +
                   JSON.stringify(res?.data),
                 AppService.name,
               );
             })
             .catch(async (e) => {
               this.logger.error(
-                `USER: ${element.attributes.mobile} |` +
+                `USER: ${user.mobile} |` +
                   JSON.stringify(e?.response?.data),
                 AppService.name,
               );
 
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 4,
                 JSON.stringify(e?.response?.data) || 'Internal Error',
               );
@@ -419,12 +424,13 @@ export class AppService {
       new Promise((resolve) => setTimeout(resolve, ms));
     const users = response.data.data;
     const processUser = async (element) => {
-      if (element.attributes.mobile) {
+      const user = strapiAttrs(element);
+      if (user.mobile) {
         if (
-          (await validateServiceProvider(element.attributes.mobile)) ==
+          (await validateServiceProvider(user.mobile)) ==
           SERVICE_PROVIDERS.DIALOG
         ) {
-          await axios(getPaymentURL(element?.attributes?.mobile), {
+          await axios(getPaymentURL(user?.mobile), {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -434,14 +440,14 @@ export class AppService {
             data: {
               amountTransaction: {
                 clientCorrelator: `${mobileGenerator(
-                  element.attributes.mobile,
+                  user.mobile,
                 )}-${Date.now()}`,
-                endUserId: `tel:${mobileGenerator(element.attributes.mobile)}`,
+                endUserId: `tel:${mobileGenerator(user.mobile)}`,
                 paymentAmount: {
                   chargingInformation: {
                     amount: CHARGE_AMOUNT,
                     currency: 'LKR',
-                    description: `My CrickQ (cycle ${element?.attributes?.cycle}).`,
+                    description: `My CrickQ (cycle ${user?.cycle}).`,
                   },
                   chargingMetaData: {
                     onBehalfOf: 'My CrickQ',
@@ -458,25 +464,25 @@ export class AppService {
           })
             .then(async (res) => {
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 10,
                 JSON.stringify(res?.data ? res.data : res) || 'Internal Error',
               );
               this.logger.log(
-                `USER (initial Cycle): ${element.attributes.mobile} |` +
+                `USER (initial Cycle): ${user.mobile} |` +
                   JSON.stringify(res?.data),
                 AppService.name,
               );
             })
             .catch(async (e) => {
               this.logger.error(
-                `USER (initial Cycle): ${element.attributes.mobile} |` +
+                `USER (initial Cycle): ${user.mobile} |` +
                   JSON.stringify(e?.response?.data),
                 AppService.name,
               );
 
               await this.updatePaymentUser(
-                element.attributes.mobile,
+                user.mobile,
                 1,
                 JSON.stringify(e?.response?.data) || 'Internal Error',
               );
@@ -521,18 +527,19 @@ export class AppService {
           new Promise((resolve) => setTimeout(resolve, ms));
         const users = response.data.data;
         const processUser = async (element) => {
+          const user = strapiAttrs(element);
           const paymentUserData: any = await this.getPaymentUser(
-            element.attributes.mobile,
+            user.mobile,
           );
           if (
-            element.attributes.mobile &&
+            user.mobile &&
             paymentUserData?.data?.data.length != 0
           ) {
             if (
-              (await validateServiceProvider(element.attributes.mobile)) ==
+              (await validateServiceProvider(user.mobile)) ==
               SERVICE_PROVIDERS.DIALOG
             ) {
-              await axios(getPaymentURL(element?.attributes?.mobile), {
+              await axios(getPaymentURL(user?.mobile), {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -542,16 +549,16 @@ export class AppService {
                 data: {
                   amountTransaction: {
                     clientCorrelator: `${mobileGenerator(
-                      element.attributes.mobile,
+                      user.mobile,
                     )}-${Date.now()}`,
                     endUserId: `tel:${mobileGenerator(
-                      element.attributes.mobile,
+                      user.mobile,
                     )}`,
                     paymentAmount: {
                       chargingInformation: {
                         amount: CHARGE_AMOUNT,
                         currency: 'LKR',
-                        description: `My CrickQ (${element?.attributes?.campaign?.data?.attributes?.campaign_name}).`,
+                        description: `My CrickQ (${strapiAttrs(user?.campaign)?.campaign_name}).`,
                       },
                       chargingMetaData: {
                         onBehalfOf: 'My CrickQ',
@@ -568,26 +575,26 @@ export class AppService {
               })
                 .then(async (res) => {
                   await this.updatePaymentUser(
-                    element.attributes.mobile,
+                    user.mobile,
                     10,
                     JSON.stringify(res?.data ? res.data : res) ||
                       'Internal Error',
                   );
                   this.logger.log(
-                    `USER: ${element.attributes.mobile} |` +
+                    `USER: ${user.mobile} |` +
                       JSON.stringify(res?.data),
                     AppService.name,
                   );
                 })
                 .catch(async (e) => {
                   this.logger.error(
-                    `USER: ${element.attributes.mobile} |` +
+                    `USER: ${user.mobile} |` +
                       JSON.stringify(e?.response?.data),
                     AppService.name,
                   );
 
                   await this.updatePaymentUser(
-                    element.attributes.mobile,
+                    user.mobile,
                     1,
                     JSON.stringify(e?.response?.data) || 'Internal Error',
                   );
@@ -656,13 +663,14 @@ export class AppService {
         },
       });
 
-      const reminderMessage = msgData?.data.data[0]?.attributes?.sms
-        ? msgData?.data.data[0]?.attributes?.sms
+      const template = strapiAttrs(msgData?.data.data[0]);
+      const reminderMessage = template?.sms
+        ? template.sms
         : SMS_REMINDERS[Math.floor(Math.random() * SMS_REMINDERS.length)];
 
       if (users) {
         const mobileNumbers = users.map((user: any) => {
-          return user.attributes.mobile;
+          return strapiAttrs(user).mobile;
         });
 
         const uniqueMobileNumbers = await _checkDuplicateNumber(mobileNumbers);
@@ -1091,22 +1099,14 @@ export class AppService {
 
   async updatePaymentUser(msisdn: string, cycle: number, log: string) {
     try {
-      await axios(
-        PAYMENT_USER_URL +
-          '/update?mobile=' +
-          msisdn +
-          '&cycle=' +
-          cycle +
-          '&log=' +
-          log,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
+      await axios(PAYMENT_USER_URL + '/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-      );
+        params: { mobile: msisdn, cycle, log },
+      });
 
       this.logger.log('==== updatePaymentUser ====' + msisdn, AppService.name);
     } catch (e) {
@@ -1298,9 +1298,25 @@ export class AppService {
     }
   }
 
+  // Strapi v5 deletes by documentId; clients may still send the numeric id.
+  async getLeaderboardDocumentId(userId: any): Promise<string> {
+    if (isNaN(Number(userId))) {
+      return userId;
+    }
+    const response = await axios(GET_LEADERBOARD_BY_ID + userId, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+    return response.data?.data?.[0]?.documentId ?? userId;
+  }
+
   async unsubscribe(dto: UserSubscribeRequestDTO): Promise<any> {
     try {
-      await axios(DELETE_USER_DATA + dto.userId, {
+      const documentId = await this.getLeaderboardDocumentId(dto.userId);
+      await axios(DELETE_USER_DATA + documentId, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
