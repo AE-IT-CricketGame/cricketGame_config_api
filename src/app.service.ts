@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OTPRequestDTO } from './dto/otp.request.dto';
 import axios from 'axios';
 import {
@@ -960,6 +960,16 @@ export class AppService {
           '==== VERIFY DIALOG ====' + JSON.stringify(response.data),
           AppService.name,
         );
+
+        // IdeaBiz answers 200 even for a wrong pin ({ statusCode: 'ERROR', message: 'Wrong pin' })
+        if (
+          userData?.status != 'SUBSCRIBED' &&
+          userData?.status != 'ALREADY_SUBSCRIBED'
+        ) {
+          throw new BadRequestException(
+            response.data?.message || 'OTP is invalid',
+          );
+        }
 
         return response;
       } else if ((await validateServiceProvider(dto.mobile)) == 'hutch') {
